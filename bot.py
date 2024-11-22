@@ -4,6 +4,10 @@ from os import environ
 from pyrogram import Client, filters
 from pyrogram.errors import FloodWait
 
+from aiohttp import web
+from plugins import web_server
+PORT = environ.get("PORT", "8080")
+
 logging.basicConfig(level=logging.ERROR)
        
 SESSION = environ.get("SESSION", "")        
@@ -38,6 +42,11 @@ async def approve(client, message):
     msg = await client.send_message(Id, "**Task Completed** ✓ **Approved Pending All Join Request**")
     await msg.delete()
 
+
+app = web.AppRunner(await web_server())
+await app.setup()
+bind_address = "0.0.0.0"
+await web.TCPSite(app, bind_address, PORT).start()
 
 logging.info("Bot Started....")
 User.run()
